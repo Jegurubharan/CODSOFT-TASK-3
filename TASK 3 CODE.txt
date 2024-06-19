@@ -1,0 +1,87 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import random
+import string
+
+def generate_password(length, complexity):
+    if complexity == 'strong':
+        characters = string.ascii_letters + string.digits + string.punctuation
+    elif complexity == 'medium':
+        characters = string.ascii_letters + string.digits
+    elif complexity == 'weak':
+        characters = string.ascii_lowercase + string.digits
+    else:
+        raise ValueError("Complexity should be 'weak', 'medium', or 'strong'.")
+    
+    password = ''.join(random.choice(characters) for _ in range(length))
+    return password
+
+def generate_password_gui():
+    def generate():
+        try:
+            user_name = name_entry.get()
+            if not user_name:
+                raise ValueError("Please enter your name.")
+            
+            length = int(length_entry.get())
+            if length <= 0 or length > 1000:
+                raise ValueError("Password length must be between 1 and 1000 characters.")
+            
+            complexity = complexity_var.get()
+            password = generate_password(length, complexity)
+            password_label.config(text=f"{user_name}, generated password: " + password)
+        except ValueError as e:
+            messagebox.showerror("Error", str(e))
+    
+    # Create the main window
+    root = tk.Tk()
+    root.title("Password Generator")
+
+    # Frame for inputs
+    input_frame = ttk.Frame(root, padding="20")
+    input_frame.grid(row=0, column=0, sticky="nsew")
+
+    # Label and Entry for user's name
+    name_label = ttk.Label(input_frame, text="Your Name:")
+    name_label.grid(row=0, column=0, sticky="w", padx=5, pady=5)
+
+    name_entry = ttk.Entry(input_frame, width=30)
+    name_entry.grid(row=0, column=1, padx=5, pady=5)
+
+    # Label and Entry for password length
+    length_label = ttk.Label(input_frame, text="Password Length:")
+    length_label.grid(row=1, column=0, sticky="w", padx=5, pady=5)
+
+    length_entry = ttk.Entry(input_frame, width=30)
+    length_entry.grid(row=1, column=1, padx=5, pady=5)
+
+    # Label and Combobox for complexity
+    complexity_label = ttk.Label(input_frame, text="Complexity:")
+    complexity_label.grid(row=2, column=0, sticky="w", padx=5, pady=5)
+
+    complexity_var = tk.StringVar()
+    complexity_choices = ['weak', 'medium', 'strong']
+    complexity_combobox = ttk.Combobox(input_frame, textvariable=complexity_var, values=complexity_choices, state="readonly")
+    complexity_combobox.grid(row=2, column=1, padx=5, pady=5)
+    complexity_combobox.current(1)  # Set default selection to 'medium'
+
+    # Generate Button
+    generate_button = ttk.Button(input_frame, text="Generate Password", command=generate)
+    generate_button.grid(row=3, column=0, columnspan=2, pady=10)
+
+    # Frame for displaying generated password
+    result_frame = ttk.Frame(root, padding="20")
+    result_frame.grid(row=1, column=0, sticky="nsew")
+
+    password_label = ttk.Label(result_frame, text="")
+    password_label.pack()
+
+    # Set grid weights to make the input frame expandable
+    root.grid_rowconfigure(0, weight=1)
+    root.grid_columnconfigure(0, weight=1)
+
+    # Start the GUI main loop
+    root.mainloop()
+
+if __name__ == "__main__":
+    generate_password_gui()
